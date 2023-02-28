@@ -10,6 +10,12 @@ contract TokenFactory is Ownable {
 
     constructor() {}
 
+    function addTokenToDeployedToken(address token) internal {
+        tokenContracts.push(token);
+        isTokenDeployed[token] = true;
+        tokenCounter++;
+    }
+
     function deployNewToken(
         string memory name,
         string memory symbol,
@@ -18,11 +24,8 @@ contract TokenFactory is Ownable {
     ) external onlyOwner returns (address) {
         Token newToken = new Token(name, symbol, supply);
         newToken.transferOwnership(newOwner);
-        tokenContracts.push(address(newToken));
-        tokenCounter++;
-        newToken.transfer(newOwner, supply*(1e18));
-        isTokenDeployed[address(newToken)] = true;
-
+        newToken.transfer(newOwner, supply * (1e18));
+        addTokenToDeployedToken(address(newToken));
         return address(newToken);
     }
 
